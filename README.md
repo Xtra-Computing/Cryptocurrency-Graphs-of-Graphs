@@ -1,6 +1,6 @@
 # Graph-of-graph-dataset
 
-This repository contains the datasets and code for our research paper titled "Multi-Chain Graphs of Graphs: A New Paradigm in Blockchain Dataset". Our study introduces a large-scale, cross-chain, graphs-of-graphs datasets and applies graph machine learning techniques to analyze blockchain transactions.
+This repository contains the datasets and code for our research paper titled "Multi-Chain Graphs of Graphs: A New Paradigm in Blockchain Dataset". Our study introduces a large-scale, cross-chain, graphs-of-graphs datasets and applies various graph machine learning techniques to analyze blockchain graphs.
 
 ## Contents
 - `data/` - Contains links to the datasets used in our research and instructions for accessing them.
