@@ -3,8 +3,7 @@ import argparse
 import torch
 import numpy as np
 from train import train, evaluate
-from model import GCN2, GIN2, GraphSAGE, GAT, GraphSAGE2, GAT2
-from dataloader_features import TransactionDataset
+from dataloader import TransactionDataset
 from torch.utils.data import Dataset, Subset, SubsetRandomSampler, random_split
 from torch_geometric.loader import DataLoader
 from sklearn.metrics import classification_report
@@ -14,7 +13,6 @@ import heapq
 from torch_geometric.data import Data
 import random
 
-
 def remap_labels_to_binary(dataset):
     label_map = {9: 1}  # Fraud class
     new_label = 0
@@ -22,11 +20,10 @@ def remap_labels_to_binary(dataset):
         old_label = data.y.item()
         if old_label != 9 and old_label not in label_map:
             label_map[old_label] = new_label
-            new_label = 0  # All other classes mapped to 0
+            new_label = 0 
 
-    print(f"Label map: {label_map}")  # Debug: Print the label map
+    print(f"Label map: {label_map}") 
 
-    # Apply the label mapping directly to each data point in the subset
     remapped_data_list = []
     for i in range(len(dataset)):
         data = dataset[i]
@@ -35,7 +32,6 @@ def remap_labels_to_binary(dataset):
             data.y = torch.tensor(label_map[old_label])
         remapped_data_list.append(data)
 
-    # Ensure all labels are correctly remapped
     for data in remapped_data_list:
         assert data.y.item() in [0, 1], f"Label {data.y.item()} out of range for binary classification."
 
@@ -49,7 +45,7 @@ def remap_labels_to_multiclass(dataset, exclude_classes):
         if old_label not in exclude_classes and old_label not in label_map:
             label_map[old_label] = new_label
             new_label += 1
-    print(f"Label map: {label_map}")  # Debug: Print the label map
+    print(f"Label map: {label_map}") 
     remapped_data_list = []
     for i in range(len(dataset)):
         data = dataset[i]
@@ -58,33 +54,10 @@ def remap_labels_to_multiclass(dataset, exclude_classes):
             data.y = torch.tensor(label_map[old_label])
             remapped_data_list.append(data)
     
-    # Ensure all labels are correctly remapped
     for data in remapped_data_list:
         assert 0 <= data.y.item() < len(label_map), f"Label {data.y.item()} out of range after remapping."
 
     return remapped_data_list, len(label_map)
-
-def update_labels_from_csv(dataset, labels_path):
-    labels_df = pd.read_csv(labels_path)
-    new_labels = labels_df['simple_class'].values  # Adjust the column name if needed.
-    if len(dataset) != len(new_labels):
-        print(len(dataset))
-        print(len(new_labels))
-        raise ValueError("The number of labels does not match the number of entries in the dataset.")
-
-    remapped_data_list = []
-    for i, data in enumerate(dataset):
-        if new_labels[i] == 'n':
-            continue
-        int_i = int(new_labels[i])
-        new_label_tensor = torch.tensor([int_i], dtype=torch.long)  # Create a consistent 1-dim tensor for labels.
-        data.y = new_label_tensor
-        remapped_data_list.append(data)
-
-    for data in remapped_data_list:
-        assert len(data.y.shape) == 1 and data.y.shape[0] == 1, f"Label tensor shape mismatch at index {i}"
-
-    return remapped_data_list
 
 def print_class_ratios(dataset):
     label_counts = {}
@@ -119,7 +92,6 @@ def resample_by_labels(dataset, ratio = 1):
     
     if ratio == 'balanced':
         average_class_count = int(np.mean(list(class_counts.values())))
-        # average_class_count = heapq.nlargest(3, class_counts.values())[-1]
         class_indices = {class_id: [] for class_id in class_counts}
         for i, data in enumerate(dataset):
             class_indices[data.y.item()].append(i)
@@ -153,10 +125,10 @@ def print_class_ratios_loader(dataloader):
 
     i = 0
     for data in dataloader:
-        labels = data.y  # Directly accessing the labels for graphs in the batch
+        labels = data.y  
         
         for label in labels:
-            label = label.item()  # Converting each label tensor to an integer
+            label = label.item()  
             if label in label_counts:
                 label_counts[label] += 1
             else:
@@ -171,9 +143,6 @@ def print_class_ratios_loader(dataloader):
     for label, ratio in class_ratios.items():
         print(f"Class {label}: {ratio:.4f} ({label_counts[label]} samples)")
 
-
-from torch_geometric.data import Data
-import torch
 
 def select_features_index(dataset, index=[0, 1, 2], scale_indices=[3, 4], scale_factor=1e18):
     remapped_data_list = []
@@ -191,7 +160,6 @@ def select_features_index(dataset, index=[0, 1, 2], scale_indices=[3, 4], scale_
         remapped_data_list.append(new_data)
 
     return remapped_data_list
-
 
 
 def calculate_class_weights(dataset):

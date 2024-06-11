@@ -7,13 +7,17 @@ def parameter_parser():
     parser = argparse.ArgumentParser(description="Run Graph Models")
     
     # Common arguments for all models
-    parser.add_argument("--model_type", type=str, choices=["DVGGA", "GOGNN", "SEAL"], required=True,
+    parser.add_argument("--model", type=str, default = "SEAL", choices=["DVGGA", "GOGNN", "SEAL"], 
                         help="Type of the graph model to run.")
-    parser.add_argument("--graphs", nargs="?", default="./input/graphs/",
-                        help="Folder with training graph jsons.")
-    parser.add_argument("--hierarchical-graph", nargs="?", default="./input/synthetic_edges.csv",
-                        help="Hierarchical edge list.")
-    parser.add_argument("--epochs", type=int, default=100, help="Number of training epochs.")
+    parser.add_argument("--graphs",
+                        nargs="?",
+                        default="../GoG/polygon/",
+	                help="Folder with training graph jsons.")
+    parser.add_argument("--hierarchical-graph",
+                        nargs="?",
+                        default="../global_graph/polygon_graphs_more_than_1_ratio.csv",
+	                help="Hierarchical edge list.")
+    parser.add_argument("--epochs", type=int, default=5, help="Number of training epochs.")
     parser.add_argument("--learning-rate", type=float, default=0.01, help="Learning rate.")
     parser.add_argument("--weight-decay", type=float, default=5e-5, help="Weight decay for Adam optimizer.")
     parser.add_argument("--gamma", type=float, default=1e-5, help="Regularization coefficient for model.")

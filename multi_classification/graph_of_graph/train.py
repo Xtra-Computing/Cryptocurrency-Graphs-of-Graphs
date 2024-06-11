@@ -26,13 +26,13 @@ class SEALCITrainer(object):
         """
         Conditionally creating a model based on the specified model type.
         """
-        if self.args.model_type == "SEAL":
+        if self.args.model == "SEAL":
             self.model = SEAL(self.args, self.dataset_generator.number_of_features,
                             self.dataset_generator.number_of_labels).to(self.args.device)
-        elif self.args.model_type == "NetModular":
+        elif self.args.model == "GOGNN":
             self.model = NetModular(self.args, self.dataset_generator.number_of_features,
                                     self.dataset_generator.number_of_labels).to(self.args.device)
-        elif self.args.model_type == "DVGGA":
+        elif self.args.model == "DVGGA":
             self.model = DVGGA(self.args, self.dataset_generator.number_of_features, 
                             self.macro_graph.number_of_nodes(),
                             self.dataset_generator.number_of_labels).to(self.args.device)
@@ -119,7 +119,9 @@ class SEALCITrainer(object):
 
             loss = torch.nn.functional.nll_loss(predictions[self.train_mask], 
                                     self.dataset_generator.target[self.train_mask])
-            loss = loss + self.args.gamma * penalty
+            if penalty:
+                loss = loss + self.args.gamma * penalty
+            
             loss.backward()
             optimizer.step()
             if epoch % 10 == 0:

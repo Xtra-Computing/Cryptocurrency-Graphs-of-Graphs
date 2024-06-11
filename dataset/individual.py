@@ -7,18 +7,8 @@ from torch_geometric.data import InMemoryDataset
 import os
 from torch_geometric.data import Data
 
-
 import warnings
 warnings.filterwarnings("ignore")
-
-parser = argparse.ArgumentParser()
-parser.add_argument('--dataset', type=str, default='Cora')
-parser.add_argument('--hidden_channels', type=int, default=16)
-parser.add_argument('--lr', type=float, default=0.001)
-parser.add_argument('--epochs', type=int, default=200)
-parser.add_argument('--use_gdc', action='store_true', help='Use GDC')
-parser.add_argument('--wandb', action='store_true', help='Track experiment')
-args, unknown = parser.parse_known_args()
 
 class TransactionDataset(InMemoryDataset):
     def __init__(self, root, transaction_dfs, labels, contract_addresses, chain, transform=None, pre_transform=None):

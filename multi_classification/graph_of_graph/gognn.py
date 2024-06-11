@@ -15,7 +15,7 @@ class NetModular(torch.nn.Module):
         self.nhid = args.nhid
         self.ddi_nhid = args.ddi_nhid
         self.pooling_ratio = args.pooling_ratio
-        self.dropout_ratio = args.dropout_ratio
+        self.dropout = args.dropout
         self.number_labels = num_labels
 
         self.conv1 = GCNConv(self.num_features, self.nhid).to(args.device)
@@ -74,7 +74,7 @@ class NetModular(torch.nn.Module):
 
         modular_feature = torch.cat(tuple(modular_output))
         
-        modular_feature = nn.Dropout(self.args.dropout_ratio)(modular_feature)
+        modular_feature = nn.Dropout(self.args.dropout)(modular_feature)
         modular_feature = modular_feature.to(self.args.device)
 
         x = F.relu(self.conv_noattn(modular_feature, ddi_edge_index))
@@ -103,7 +103,7 @@ class NetSeGraph(torch.nn.Module):
         self.nhid = args.nhid
         self.ddi_nhid = args.ddi_nhid
         self.pooling_ratio = args.pooling_ratio
-        self.dropout_ratio = args.dropout_ratio
+        self.dropout = args.dropout
 
         self.conv1 = GCNConv(self.num_features, self.nhid).to(args.device)
         self.pool1 = SAGPooling(self.nhid, ratio=self.pooling_ratio).to(args.device)
@@ -150,7 +150,7 @@ class NetSeGraph(torch.nn.Module):
             modular_output.append(out_x)
 
         modular_feature = torch.cat(tuple(modular_output))
-        modular_feature = nn.Dropout(self.args.dropout_ratio)(modular_feature)
+        modular_feature = nn.Dropout(self.args.dropout)(modular_feature)
 
         x = F.relu(self.conv4(modular_feature, ddi_edge_index, ddi_edge_attr))
         pos_source, pos_target, neg_source, neg_target = self.feature_split(x, ddi_edge_index, neg_edge_index)

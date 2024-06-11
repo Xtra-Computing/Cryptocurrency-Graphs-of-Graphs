@@ -39,7 +39,7 @@ def main():
         torch.manual_seed(seed)
         np.random.seed(seed)
 
-        dataset = TransactionDataset(root=f'../erc20/Final/GCN/GCN_simple3/{args.chain}')
+        dataset = TransactionDataset(root=f'../GCN/{args.chain}')
         labels = [dataset.get_label(idx) for idx in range(len(dataset))] 
         dataset = select_features_index(dataset, index=args.features)
         num_classes = len(set(labels))
@@ -73,7 +73,6 @@ def main():
 
         optimizer = torch.optim.Adam(model.parameters(), lr=args.lr)
 
-
         criterion = torch.nn.CrossEntropyLoss()
 
         for epoch in range(args.epochs):
@@ -87,7 +86,6 @@ def main():
                 print(f'Epoch {epoch+1}/{args.epochs}, Test Loss: {test_metrics[0]}')
 
             metrics['train'].append(train_metrics)
-            # metrics['val'].append(val_metrics)
             metrics['test'].append(test_metrics)
 
         # Summarize results
