@@ -11,6 +11,7 @@ This is the repository for "Multi-Chain Graphs of Graphs: A New Paradigm in Bloc
   - [Dataset Overview](#dataset-overview)
   - [Dataset Access and Usage](#dataset-access-and-usage)
 - [Analyses and Experiments](#using-the-dataset)
+  - [Data Preparation](#data-prepare)
   - [Data Analysis](#data-analysis)
   - [Fraud Detection](#fraud-detection)
   - [Multi-Class Classification](#multi-class-classification)
@@ -70,7 +71,7 @@ The `transactions` folder houses zipped archives with detailed transaction recor
 - `bnb.zip`
 Each zip file includes comprehensive transaction data such as block number, sender (from), receiver (to), transaction hash, value, and timestamp.
 
-- Example code to build the global graphs for exploration:
+- Example code to build the local graphs for exploration:
 ```bash 
 import networkx as nx
 import pandas as pd
@@ -97,8 +98,14 @@ To effectively use this dataset, follow these steps:
 4. Refer to `labels.csv` to understand the categorization of each contract, which is crucial for targeted analysis and comparative studies across different categories.
 
 ## Analyses and Experiments
+
+### Data Preparation
+Scripts for preparing data are under `dataset/`. 
+- `individual`: Script for preparing data for individual graph learning models.
+- `gog`: Script for preparing data for GoG-based learning models.
+
 ### Data Analysis
-Scripts for analyzing both local and global graphs are located under `code/analysis/`. 
+Scripts for analyzing both local and global graphs are located under `analysis/`. 
 - `analyze_local_graphs.py`: Script for performing detailed analysis on local graphs.
 - `analyze_global_graphs.py`: Script for analyzing global graph structures and metrics.
 - `combine_analysis.py`: Combines results from local and global graph analyses.
@@ -111,7 +118,7 @@ python analyze_global_graphs.py
 ```
 
 ### Fraud Detection
-Navigate to `code/fraud_detection/` to access scripts for anomaly detection applied to individual graphs and graphs-of-graphs:
+Navigate to `fraud_detection/` to access scripts for anomaly detection applied to individual graphs and graphs-of-graphs:
 - `graph_individual/`: Contains code for detecting anomalies in individual graph structures. These scripts use various graph-based anomaly detection techniques tailored for individual graphs.
 - `graph_of_graphs/`: Includes code for anomaly detection employing techniques that consider graphs-of-graphs model.
 
@@ -124,7 +131,7 @@ python main.py
 ```
 
 ### Multi-Class Classification
-Navigate to `code/multi-class_classification/` to access scripts for performing multi-class classification on both individual graphs and graphs-of-graphs:
+Navigate to `multi-class_classification/` to access scripts for performing multi-class classification on both individual graphs and graphs-of-graphs:
 - `graph_individual/`: This folder includes models and scripts for classifying individual graphs into multiple categories based on their structural and transactional features.
 - `graph_of_graphs/`: Contains models and scripts for classifying graphs with graphs-of-graphs model.
 
