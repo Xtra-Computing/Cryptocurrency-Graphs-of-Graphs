@@ -126,7 +126,7 @@ Navigate to `fraud_detection/` to access scripts for anomaly detection applied t
 cd graph_individual/
 python main.py
 
-cd ../graph_of_graphs/
+cd graph_of_graphs/
 python main.py
 ```
 
@@ -139,7 +139,7 @@ Navigate to `multi-class_classification/` to access scripts for performing multi
 cd graph_individual/
 python main.py --chain polygon --model GCN
 
-cd ../graph_of_graphs/
+cd graph_of_graphs/
 python main.py --chain polygon --model SEAL
 ```
 
