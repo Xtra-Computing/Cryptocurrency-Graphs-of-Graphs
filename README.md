@@ -15,7 +15,6 @@ This is the repository for "Multi-Chain Graphs of Graphs: A New Paradigm in Bloc
   - [Fraud Detection](#fraud-detection)
   - [Multi-Class Classification](#multi-class-classification)
 - [License](#license)
-- [Contributing](#contributing)
 
 ## Repository Overview
 This repository contains both the datasets used in our research and the code for analysis and model training. Here you can find everything needed to replicate our studies or use our data and models for your own research.
