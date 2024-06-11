@@ -10,7 +10,7 @@ This is the repository for "Multi-Chain Graphs of Graphs: A New Paradigm in Bloc
   - [Requirements](#requirements)
   - [Dataset Overview](#dataset-overview)
   - [Dataset Access and Usage](#dataset-access-and-usage)
-- [Using the Dataset](#using-the-dataset)
+- [Analyses and Experiments](#using-the-dataset)
   - [Data Analysis](#data-analysis)
   - [Fraud Detection](#fraud-detection)
   - [Multi-Class Classification](#multi-class-classification)
@@ -50,31 +50,72 @@ pip install numpy==1.26.2 pandas==1.3.5 torch==2.3.0+cu118 networkx==3.3
 ### Dataset Overview
 #### Global Graphs
 - Contains data for Ethereum, Polygon, and BNB within the `global graph` folder:
-  - `{chain}_graph_more_than_1_ratio.csv`
-  - `{chain}_contract_to_number_mapping.json`
+  - `{chain}_graph_more_than_1_ratio.csv`: Contains edges where the weight—indicative of transactional or interaction metrics—exceeds 1\%. This is the same as the setting of our experiments in the paper. In this file, contracts are denoted by numerical indices rather than traditional addresses.
+  - `{chain}_contract_to_number_mapping.json`:  Maps each contract's address to a numerical index utilized in the global graph files, facilitating cross-reference and analysis.
+
+- Example code to build the global graphs for exploration:
+```bash 
+import networkx as nx
+import pandas as pd
+
+df = pd.read_csv(f'{chain}_graph_more_than_1_ratio.csv')
+G = nx.Graph()  
+for idx, row in df.iterrows():
+    G.add_edge(row['Contract1'], row['Contract2'], weight=row['weight'])
+```
 
 #### Transactions
-- Transaction records are stored in zipped files for each chain (`ethereum.zip`, `polygon.zip`, `bnb.zip`), including detailed data like block number, sender, receiver, transaction hash, value, and timestamp.
+The `transactions` folder houses zipped archives with detailed transaction records for all labeled contracts within the aforementioned chains:
+- `ethereum.zip`
+- `polygon.zip`
+- `bnb.zip`
+Each zip file includes comprehensive transaction data such as block number, sender (from), receiver (to), transaction hash, value, and timestamp.
+
+- Example code to build the global graphs for exploration:
+```bash 
+import networkx as nx
+import pandas as pd
+
+df = pd.read_csv(f'{contract_address}.csv')
+G = nx.Graph()  
+for idx, row in df.iterrows():
+    G.add_edge(row['from'], row['to'], weight=row['value'])
+```
 
 #### Labels
-- `labels.csv` categorizes each contract across chains with fields for Chain, Contract, and Category.
+The `labels.csv` file categorizes each contract across different chains. It includes the following columns:
+- `Chain`: Specifies the blockchain platform (e.g., Ethereum, Polygon, BNB).
+- `Contract`: Lists the contract address or identifier.
+- `Category`: Represents the category of the contract, indexed by the prevalence of contracts within that category (Category 0 contains the most contracts).
 
 ### Dataset Access and Usage
-The dataset is available via [this link](https://drive.google.com/drive/folders/1VV5ht9Eh8WGtKfkS0ipIk0FNI7g-WJfJ?usp=share_link). Follow these steps for effective utilization:
-1. Download and decompress the necessary files.
-2. Use the JSON mapping files to interpret the global graphs.
-3. Consult `labels.csv` to understand contract categorizations.
+The dataset is available via [Token Data](https://drive.google.com/drive/folders/1VV5ht9Eh8WGtKfkS0ipIk0FNI7g-WJfJ?usp=share_link). 
 
-## Using the Dataset
+To effectively use this dataset, follow these steps:
+1. Download the necessary files using the link provided above.
+2. Decompress each chain's transaction archive to access individual transaction details.
+3. Employ the JSON mapping files to decode contract indices within the global graphs.
+4. Refer to `labels.csv` to understand the categorization of each contract, which is crucial for targeted analysis and comparative studies across different categories.
+
+## Analyses and Experiments
 ### Data Analysis
-Scripts for analyzing both local and global graphs are located under `code/analysis/`. Run the following commands for respective analyses:
+Scripts for analyzing both local and global graphs are located under `code/analysis/`. 
+- `analyze_local_graphs.py`: Script for performing detailed analysis on local graphs.
+- `analyze_global_graphs.py`: Script for analyzing global graph structures and metrics.
+- `combine_analysis.py`: Combines results from local and global graph analyses.
+- `local_metric/`: Contains scripts and utilities specifically for calculating various graph metrics on local graphs.
+
+Run the following commands for respective analyses:
 ```bash
 python analyze_local_graphs.py
 python analyze_global_graphs.py
 ```
 
 ### Fraud Detection
-Navigate to `code/fraud_detection/` to access scripts for anomaly detection across graph structures:
+Navigate to `code/fraud_detection/` to access scripts for anomaly detection applied to individual graphs and graphs-of-graphs:
+- `graph_individual/`: Contains code for detecting anomalies in individual graph structures. These scripts use various graph-based anomaly detection techniques tailored for individual graphs.
+- `graph_of_graphs/`: Includes code for anomaly detection employing techniques that consider graphs-of-graphs model.
+
 ```bash
 cd graph_individual/
 python main.py
@@ -84,7 +125,10 @@ python main.py
 ```
 
 ### Multi-Class Classification
-Classification scripts can be found under `code/multi-class_classification/`. Execute models as follows:
+Navigate to `code/multi-class_classification/` to access scripts for performing multi-class classification on both individual graphs and graphs-of-graphs:
+- `graph_individual/`: This folder includes models and scripts for classifying individual graphs into multiple categories based on their structural and transactional features.
+- `graph_of_graphs/`: Contains models and scripts for classifying graphs with graphs-of-graphs model.
+
 ```bash
 cd graph_individual/
 python main.py --chain polygon --model GCN
