@@ -110,7 +110,7 @@ def main():
 
     x = torch.cat(graph_embeddings, dim=0)
 
-    hierarchical_graph = hierarchical_graph_reader(f'../../data/edges/{chain}_graphs.csv')
+    hierarchical_graph = hierarchical_graph_reader(f'../GoG/{chain}/edges/global_edges.csv')
     edge_index = torch.LongTensor(list(hierarchical_graph.edges)).t().contiguous()
 
     global_data = Data(x=x, edge_index=edge_index, y=y)

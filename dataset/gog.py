@@ -24,7 +24,6 @@ def save_transaction_graph(df, label, idx, directory):
     unique_addresses = pd.concat([df['from'], df['to']]).unique()
     address_to_index = {address: i for i, address in enumerate(unique_addresses)}
     
-    # Initialize dictionaries to store degrees and transaction values
     in_degree = defaultdict(int)
     out_degree = defaultdict(int)
     in_value = defaultdict(float)
@@ -71,7 +70,7 @@ if __name__ == "__main__":
     os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 
     chain = 'Polygon'
-    labels = pd.read_csv('../data/labels.csv').query('Chain == @chain')
+    labels = pd.read_csv('../data/labels.csv').query('Chain == @chain').reset_index(drop=True)
 
     transaction_dfs = []
 
@@ -88,6 +87,11 @@ if __name__ == "__main__":
     for idx, (df, label) in enumerate(zip(transaction_dfs_select, labels_select)):
         save_transaction_graph(df, label, idx, directory)
     
-
-
+    all_address_index = dict(zip(labels.addr, labels.addr_index))
+    global_graph = pd.read_csv(f'../data/{chain}_graph_more_than_1_ratio.csv') # contract1, contract2 should be in address
+    global_graph['graph_1'] = global_graph['Contract1'].apply(lambda x: all_address_index[x])
+    global_graph['graph_2'] = global_graph['Contract2'].apply(lambda x: all_address_index[x])
+    global_graph.to_csv(f'../GoG/{chain}/edges/global_edges.csv', index = 0)
+    
+    
 

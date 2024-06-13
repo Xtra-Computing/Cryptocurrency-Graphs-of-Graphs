@@ -15,7 +15,7 @@ def parameter_parser():
 	                help="Folder with training graph jsons.")
     parser.add_argument("--hierarchical-graph",
                         nargs="?",
-                        default="../global_graph/polygon_graphs_more_than_1_ratio.csv",
+                        default="../GoG/polygon/edges/global_edges.csv",
 	                help="Hierarchical edge list.")
     parser.add_argument("--epochs", type=int, default=5, help="Number of training epochs.")
     parser.add_argument("--learning-rate", type=float, default=0.01, help="Learning rate.")
