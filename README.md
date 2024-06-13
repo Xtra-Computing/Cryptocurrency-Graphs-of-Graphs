@@ -62,7 +62,7 @@ pip install numpy==1.26.2 pandas==1.3.5 torch==2.3.0+cu118 networkx==3.3 \
 python -m pip install snap-stanford \
 torch-scatter==2.1.2+pt23cu118 torch-sparse==0.6.18+pt23cu118 \
 torch-cluster==1.6.3+pt23cu118 torch-geometric==2.5.3
-
+```
 
 ### Dataset Overview
 #### Global Graphs
@@ -133,6 +133,7 @@ python local.py
 python global.py
 python common_node.py
 ```
+
 
 ### Data Preparation
 Scripts for preparing data are under `dataset/`. 
