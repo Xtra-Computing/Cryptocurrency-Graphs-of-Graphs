@@ -107,18 +107,18 @@ class GAT(torch.nn.Module):
 
 
 class ResidualGCN(torch.nn.Module):
-    def __init__(self, num_features, num_classes, hidden_channels=16, num_layers=3, dropout=0.5):
+    def __init__(self, num_features, num_classes, hidden_dim=16, num_layers=2, dropout=0):
         super(ResidualGCN, self).__init__()
         self.dropout = dropout
         self.num_classes = num_classes
         self.num_features = num_features
-        self.hidden_channels = hidden_channels
-        self.initial_conv = GCNConv(num_features, hidden_channels)
+        self.hidden_dim = hidden_dim
+        self.initial_conv = GCNConv(num_features, hidden_dim)
 
         self.convs = ModuleList()
         for _ in range(num_layers - 2):
-            self.convs.append(GCNConv(hidden_channels, hidden_channels))
-        self.final_conv = GCNConv(hidden_channels, num_classes)
+            self.convs.append(GCNConv(hidden_dim, hidden_dim))
+        self.final_conv = GCNConv(hidden_dim, num_classes)
 
     def forward(self, data):
         x, edge_index = data.x, data.edge_index
@@ -135,6 +135,3 @@ class ResidualGCN(torch.nn.Module):
 
         x = global_mean_pool(x, data.batch)  
         return F.log_softmax(x, dim=1)
-
-    def __repr__(self):
-        return f"ResidualGCN with {len(self.convs) + 2} layers (Hidden channels: {self.hidden_channels})"
