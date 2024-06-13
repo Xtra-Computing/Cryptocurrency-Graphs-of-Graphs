@@ -1,15 +1,14 @@
 import torch
 import numpy as np
-import random
-from pygod.detector import DOMINANT, DONE, GAE, AnomalyDAE, DMGD, GUIDE, OCGNN, CoLA, CONAD, GADNR
-from pygod.metric import eval_roc_auc
 from torch_geometric.data import Data
-from sklearn.metrics import roc_auc_score, average_precision_score
-from utils import hierarchical_graph_reader, GraphDatasetGenerator
-
-class Args:
-    def __init__(self):
-        self.device = 'cuda:1'  
+from utils import hierarchical_graph_reader
+from param_parser import parameter_parser
+from pygod.detector import DOMINANT, DONE, GAE, AnomalyDAE, CoLA
+from pygod.metric import eval_roc_auc
+from sklearn.metrics import average_precision_score, roc_auc_score
+import os
+import pandas as pd
+import random
 
 def create_masks(num_nodes):
     indices = np.arange(num_nodes)
@@ -34,6 +33,24 @@ def eval_roc_auc(label, score):
         roc_auc = roc_auc_score(y_true=label, y_score=score)
     return roc_auc
 
+def train_and_evaluate(detector, data, epochs=50, eval_interval=5):
+    optimizer = torch.optim.Adam(detector.parameters(), lr=0.01, weight_decay=5e-4)
+    
+    for epoch in range(1, epochs + 50):
+        detector.train()
+        optimizer.zero_grad()
+        loss = detector(data)
+        loss.backward()
+        optimizer.step()
+        
+        if epoch % eval_interval == 0 or epoch == epochs:
+            detector.eval()
+            with torch.no_grad():
+                pred, score, _, _ = detector.predict(data, return_pred=True, return_score=True)
+                auc_score = eval_roc_auc(data.y, score)
+                ap_score = average_precision_score(data.y.cpu().numpy(), score.cpu().numpy())
+                print(f'Epoch {epoch:03d}, Loss: {loss.item():.4f}, AUC: {auc_score:.4f}, AP: {ap_score:.4f}')
+
 def run_model(detector, data, seeds):
     auc_scores = []
     ap_scores = []
@@ -55,26 +72,59 @@ def run_model(detector, data, seeds):
 
     return np.mean(auc_scores), np.std(auc_scores), np.mean(ap_scores), np.std(ap_scores)
 
-def main():
-    args = Args()
-    chain = 'bnb'
-    dataset_generator = GraphDatasetGenerator(f'/{chain}/{chain}_basic_metrics_processed.csv')
-    data_list = dataset_generator.get_pyg_data_list()
+def load_labels(filepath, column_name='label'):
+    try:
+        labels = pd.read_csv(filepath)[column_name].values
+        return torch.tensor(labels, dtype=torch.long)
+    except FileNotFoundError:
+        print(f"Error: The file {filepath} was not found.")
+        exit()
+    except KeyError:
+        print(f"Error: Column {column_name} does not exist in the file.")
+        exit()
 
-    x = torch.cat([data.x for data in data_list], dim=0)
+def main():
+    args = parameter_parser()
+    chain = 'ethereum'
+    filepath = f'/{chain}/{chain}_basic_metrics_processed.csv'
+    y = load_labels(filepath)
+    
+    graph_embeddings = []
+    embedding_path = f'../Deepwalk/{chain}'
+
+    processed_graphs = 0
+    
+    for idx in range(len(y)):
+        embedding_file = os.path.join(embedding_path, f'{idx}.npy')
+        if os.path.exists(embedding_file):
+            node_embeddings = torch.tensor(np.load(embedding_file), dtype=torch.float32)
+            mean_embedding = node_embeddings.mean(dim=0, keepdim=True).detach()
+            graph_embeddings.append(mean_embedding)
+            processed_graphs += 1
+        else:
+            print(f"Embedding file not found: {embedding_file}")
+    
+    if len(graph_embeddings) == 0:
+        raise ValueError("No graph embeddings were processed. Please check the embedding path and files.")
+
+
+    x = torch.cat(graph_embeddings, dim=0)
+
     hierarchical_graph = hierarchical_graph_reader(f'../../data/edges/{chain}_graphs.csv')
     edge_index = torch.LongTensor(list(hierarchical_graph.edges)).t().contiguous()
-    global_data = Data(x=x, edge_index=edge_index, y=dataset_generator.target)
+
+    global_data = Data(x=x, edge_index=edge_index, y=y)
     
     train_mask, val_mask, test_mask = create_masks(global_data.num_nodes)
     global_data.train_mask = train_mask
     global_data.val_mask = val_mask
     global_data.test_mask = test_mask
 
+    # Parameters to test
     model_params = {
         'DOMINANT': [{'hid_dim': d, 'lr': lr, 'epoch': e} for d in [16, 32, 64] for lr in [0.01, 0.005, 0.1] for e in [50, 100, 150]],
         'DONE': [{'hid_dim': d, 'lr': lr, 'epoch': e} for d in [16, 32, 64] for lr in [0.01, 0.005, 0.1] for e in [50, 100, 150]],
-        'GAE': [{'hid_dim': d, 'lr': lr, 'epoch': e} for d in [16, 32, 64] for lr in [0.01, 0.005, 0.1] for e in [50, 100, 150]],
+        'GAE': [{'hid_dim': d, 'lr': lr, 'epoch': e} for d in [8, 16, 32, 64] for lr in [0.01, 0.005, 0.1] for e in [50, 100, 150]],
         'AnomalyDAE': [{'hid_dim': d, 'lr': lr, 'epoch': e} for d in [16, 32, 64] for lr in [0.01, 0.005, 0.1] for e in [50, 100, 150]],
         'CoLA': [{'hid_dim': d, 'lr': lr, 'epoch': e} for d in [16, 32, 64] for lr in [0.01, 0.005, 0.1] for e in [50, 100, 150]]
     }
@@ -100,6 +150,8 @@ def main():
         param = stats['Params']
         detector = eval(f"{model_name}(hid_dim=param['hid_dim'], num_layers=2, epoch=param['epoch'], lr=param['lr'], gpu=args.device)")
         avg_auc, std_auc, avg_ap, std_ap = run_model(detector, global_data, seeds_for_evaluation)
+        print(model_name)
+        print(stats)
         print(f'Final Evaluation for {model_name}: Avg AUC={avg_auc:.4f}, Std AUC={std_auc:.4f}, Avg AP={avg_ap:.4f}, Std AP={std_ap:.4f}')
 
 if __name__ == "__main__":

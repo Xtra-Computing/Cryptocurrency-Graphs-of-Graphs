@@ -37,19 +37,36 @@ git clone https://github.com/YourUsername/Graph-of-graphs-dataset.git
 cd Graph-of-graphs-dataset
 ```
 
-### Requirements
-Ensure your environment meets the following specifications to run the scripts and models:
-- Python 3.10.14
-- Libraries: NumPy 1.26.2, pandas 1.3.5, PyTorch 2.3.0+cu118, networkx 3.3
+## Requirements
 
-Install required packages using:
+Ensure your environment meets the following specifications to successfully run the scripts and models:
+
+- **Python Version**: 3.10.14
+- **Libraries**:
+  - NumPy 1.26.2
+  - pandas 1.3.5
+  - PyTorch 2.3.0+cu118
+  - networkx 3.3
+  - snap-stanford
+  - torch-scatter 2.1.2+pt23cu118
+  - torch-sparse 0.6.18+pt23cu118
+  - torch-cluster 1.6.3+pt23cu118
+  - torch-geometric 2.5.3
+
+### Installation
+
+To install the required packages, execute the following command in your terminal:
+
 ```bash
-pip install numpy==1.26.2 pandas==1.3.5 torch==2.3.0+cu118 networkx==3.3
-```
+pip install numpy==1.26.2 pandas==1.3.5 torch==2.3.0+cu118 networkx==3.3 \
+python -m pip install snap-stanford \
+torch-scatter==2.1.2+pt23cu118 torch-sparse==0.6.18+pt23cu118 \
+torch-cluster==1.6.3+pt23cu118 torch-geometric==2.5.3
+
 
 ### Dataset Overview
 #### Global Graphs
-- Contains data for Ethereum, Polygon, and BNB within the `global graph` folder:
+- Contains data for Ethereum, Polygon, and BNB within the `global_graph` folder:
   - `{chain}_graph_more_than_1_ratio.csv`: Contains edges where the weight—indicative of transactional or interaction metrics—exceeds 1\%. This is the same as the setting of our experiments in the paper. In this file, contracts are denoted by numerical indices rather than traditional addresses.
   - `{chain}_contract_to_number_mapping.json`:  Maps each contract's address to a numerical index utilized in the global graph files, facilitating cross-reference and analysis.
 
@@ -69,7 +86,7 @@ The `transactions` folder houses zipped archives with detailed transaction recor
 - `ethereum.zip`
 - `polygon.zip`
 - `bnb.zip`
-Each zip file includes comprehensive transaction data such as block number, sender (from), receiver (to), transaction hash, value, and timestamp.
+Each zip file provides comprehensive transactions for tokens for the respective blockchains. The transactions for each token are stored in a CSV file named after the token's address. Each transaction include block number, sender (from), receiver (to), transaction hash, value, and timestamp.
 
 - Example code to build the local graphs for exploration:
 ```bash 
@@ -83,44 +100,61 @@ for idx, row in df.iterrows():
 ```
 
 #### Labels
-The `labels.csv` file categorizes each contract across different chains. It includes the following columns:
+The `labels.csv` file categorizes each contract across different chains. It includes:
 - `Chain`: Specifies the blockchain platform (e.g., Ethereum, Polygon, BNB).
 - `Contract`: Lists the contract address or identifier.
-- `Category`: Represents the category of the contract, indexed by the prevalence of contracts within that category (Category 0 contains the most contracts).
+- `Category`: Represents the category of the contract, indexed by the prevalence of contracts within that category (Category 0 contains the most contracts: fraud).
 
 ### Dataset Access and Usage
 The dataset is available via [Token Data](https://drive.google.com/drive/folders/1VV5ht9Eh8WGtKfkS0ipIk0FNI7g-WJfJ?usp=share_link). 
 
 To effectively use this dataset, follow these steps:
 1. Download the necessary files using the link provided above.
-2. Decompress each chain's transaction archive to access individual transaction details.
+2. Unzip each chain's transaction archive to access individual transaction details.
 3. Employ the JSON mapping files to decode contract indices within the global graphs.
 4. Refer to `labels.csv` to understand the categorization of each contract, which is crucial for targeted analysis and comparative studies across different categories.
 
 ## Analyses and Experiments
 
-### Data Preparation
-Scripts for preparing data are under `dataset/`. 
-- `individual`: Script for preparing data for individual graph learning models.
-- `gog`: Script for preparing data for GoG-based learning models.
-
 ### Data Analysis
 Scripts for analyzing both local and global graphs are located under `analysis/`. 
-- `analyze_local_graphs.py`: Script for performing detailed analysis on local graphs.
-- `analyze_global_graphs.py`: Script for analyzing global graph structures and metrics.
-- `combine_analysis.py`: Combines results from local and global graph analyses.
-- `local_metric/`: Contains scripts and utilities specifically for calculating various graph metrics on local graphs.
+- `local.py`: Script for performing detailed analysis on local graphs.
+- `global.py`: Script for analyzing global graph structures and metrics.
+- `common_node.py`: Scripts for finding common nodes in token graphs: 
+- `local_metrics/`: Contains scripts and utilities specifically for calculating various graph metrics on local graphs. 
+  - nx_properties.py to measure num_nodes, num_edges, density, assortativity, reciprocity; 
+  - snap_properties.py to measure  effective_diameter, clustering_coefficient.
 
 Run the following commands for respective analyses:
 ```bash
-python analyze_local_graphs.py
-python analyze_global_graphs.py
+python local_metrics/nx_properties.py
+python local_metrics/snap_properties.py
+python local.py
+python global.py
+python common_node.py
 ```
+
+### Data Preparation
+Scripts for preparing data are under `dataset/`. 
+- `individual.py`: Script for preparing data for individual graph learning models.
+- `gog.py`: Script for preparing data for GoG-based learning models.
+- 'process_graph_metrics.py': Script for preparing graph metrics for anomaly detection models.
+- 'get_deepwalk_embedding/': Scripts for preparing deepwalk embedding for anomaly detection models.
+
+```bash
+python gog.py
+python individual.py
+python process_graph_metrics.py
+
+cd get_deepwalk_embedding/
+python get_deepwalk.py
+```
+
 
 ### Fraud Detection
 Navigate to `fraud_detection/` to access scripts for anomaly detection applied to individual graphs and graphs-of-graphs:
-- `graph_individual/`: Contains code for detecting anomalies in individual graph structures. These scripts use various graph-based anomaly detection techniques tailored for individual graphs.
-- `graph_of_graphs/`: Includes code for anomaly detection employing techniques that consider graphs-of-graphs model.
+- `graph_individual/`: Includes code for detecting anomalies in individual graph structures using graph metrics and deepwalk.
+- `graph_of_graph/`: Includes code for anomaly detection employing techniques that consider graphs-of-graphs model using graph metrics and deepwalk.
 
 ```bash
 cd graph_individual/
