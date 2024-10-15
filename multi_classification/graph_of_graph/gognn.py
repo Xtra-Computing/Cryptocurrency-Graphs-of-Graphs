@@ -1,3 +1,6 @@
+"""Adapted from the implementation of GOGNN. 
+Github link: https://github.com/Hanchen-Wang/GoGNN."""
+
 import torch
 import torch.nn as nn
 import torch.nn.functional as F

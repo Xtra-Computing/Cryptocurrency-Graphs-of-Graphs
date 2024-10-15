@@ -1,3 +1,6 @@
+"""Adapted from the implementation of DVGGA. 
+Github link: https://github.com/hzcheney/Denoising-Graph-of-Graphs-AutoEncoder."""
+
 import numpy
 import torch
 import torch.nn as nn

@@ -27,7 +27,7 @@ Below are key statistics for each blockchain included in our dataset:
 |-----------|----------|--------------|------------|----------------|-------------|--------------|
 | Ethereum  | 14,464   | 2016-02      | 2024-02    | 81,788,211     | 10,247,767  | 290          |
 | Polygon   | 2,353    | 2020-08      | 2024-02    | 64,882,233     | 1,801,976   | 112          |
-| BNB       | 7,499    | 2020-09      | 2024-02    | 121,612,480    | 6,550,399   | 149          |
+| BSC       | 7,499    | 2020-09      | 2024-02    | 121,612,480    | 6,550,399   | 149          |
 
 ## Getting Started
 ### Installation
@@ -66,7 +66,7 @@ torch-cluster==1.6.3+pt23cu118 torch-geometric==2.5.3
 
 ### Dataset Overview
 #### Global Graphs
-- Contains data for Ethereum, Polygon, and BNB within the `global_graph` folder:
+- Contains data for Ethereum, Polygon, and BSC within the `global_graph` folder:
   - `{chain}_graph_more_than_1_ratio.csv`: Contains edges where the weight—indicative of transactional or interaction metrics—exceeds 1\%. This is the same as the setting of our experiments in the paper. In this file, contracts are denoted by numerical indices rather than traditional addresses.
   - `{chain}_contract_to_number_mapping.json`:  Maps each contract's address to a numerical index utilized in the global graph files, facilitating cross-reference and analysis.
 
@@ -85,7 +85,7 @@ for idx, row in df.iterrows():
 The `transactions` folder houses zipped archives with detailed transaction records for all labeled contracts within the aforementioned chains:
 - `ethereum.zip`
 - `polygon.zip`
-- `bnb.zip`
+- `bsc.zip`
 Each zip file provides comprehensive transactions for tokens for the respective blockchains. The transactions for each token are stored in a CSV file named after the token's address. Each transaction include block number, sender (from), receiver (to), transaction hash, value, and timestamp.
 
 - Example code to build the local graphs for exploration:
@@ -101,7 +101,7 @@ for idx, row in df.iterrows():
 
 #### Labels
 The `labels.csv` file categorizes each contract across different chains. It includes:
-- `Chain`: Specifies the blockchain platform (e.g., Ethereum, Polygon, BNB).
+- `Chain`: Specifies the blockchain platform (e.g., Ethereum, Polygon, BSC).
 - `Contract`: Lists the contract address or identifier.
 - `Category`: Represents the category of the contract, indexed by the prevalence of contracts within that category (Category 0 contains the most contracts: fraud).
 
