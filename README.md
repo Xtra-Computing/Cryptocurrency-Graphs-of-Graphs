@@ -86,6 +86,7 @@ The `transactions` folder houses zipped archives with detailed transaction recor
 - `ethereum.zip`
 - `polygon.zip`
 - `bsc.zip`
+  
 Each zip file provides comprehensive transactions for tokens for the respective blockchains. The transactions for each token are stored in a CSV file named after the token's address. Each transaction include block number, sender (from), receiver (to), transaction hash, value, and timestamp.
 
 - Example code to build the local graphs for exploration:
