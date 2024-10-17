@@ -142,7 +142,8 @@ python global.py
 ```
 
 ### Data Preparation
-Scripts for preparing data are under `dataset/`. 
+Scripts for preparing data are under `dataset/`.
+- `data_collection_script.py`: Script for collecting transaction data. 
 - `individual.py`: Script for preparing data for individual graph learning models.
 - `gog.py`: Script for preparing data for GoG-based learning models. 
 - `create_temporal_link.py`: Script for preparing link prediction data.
