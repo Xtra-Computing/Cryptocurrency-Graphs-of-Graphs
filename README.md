@@ -21,6 +21,10 @@ This is the repository for "Multi-Chain Graphs of Graphs: A New Paradigm in Bloc
 ## Repository Overview
 This repository contains both the datasets used in our research and the code for analysis and model training. Here you can find everything needed to replicate our studies or use our data and models for your own research.
 
+<p align='center'>
+  <img width='100%' src='gog_overview.pdf' />
+</p>
+
 ## Dataset Schema
 Below are key statistics for each blockchain included in our dataset:
 
@@ -191,7 +195,6 @@ Navigate to `link_prediction/` to access scripts for performing link prediction 
 - `graph_individual/main.py`: Train individual GNN models.
 - `graph_of_graph/main.py`: Train GoG models.
 
-To run:
 ```bash
 cd graph_individual/
 python main.py --chain polygon
