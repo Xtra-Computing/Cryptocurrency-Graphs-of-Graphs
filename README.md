@@ -153,6 +153,7 @@ Scripts for preparing data are under `dataset/`.
 - `get_deepwalk_embedding/`: Scripts for preparing deepwalk embedding for anomaly detection models.
 
 ```bash
+python data_collection_script.py
 python individual.py
 python gog.py
 python create_temporal_link.py
