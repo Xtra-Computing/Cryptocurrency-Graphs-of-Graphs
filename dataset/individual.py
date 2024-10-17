@@ -89,21 +89,36 @@ if __name__ == "__main__":
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 
-    chain = 'Polygon'
+    chain = 'polygon'
     labels = pd.read_csv('../data/labels.csv').query('Chain == @chain')
 
-    transaction_dfs = []
+    # Use three-class as an example.
+    n = 3
+    category_counts = labels['Category'].value_counts()
+    select_class = list(category_counts.head(n).index)
 
-    for i in tqdm(labels.Address.values):
+    category_to_label = {category: i for i, category in enumerate(select_class)}
+    labels['Category'] = labels['Category'].map(category_to_label)
+
+    labels_select = list(labels.query('Category < @n').Category.values)
+    labels_select_df = labels.query('Category < @n').reset_index(drop = True)
+
+    # read in transaction data
+    transaction_dfs_select = []
+    for i in tqdm(labels_select_df.Contract.values):
         tx = pd.read_csv(f'../data/transactions/{chain}/{i}.csv')
         tx['date'] = pd.to_datetime(tx['timestamp'], unit='s')
-        transaction_dfs.append(tx)
+        transaction_dfs_select.append(tx)
 
-    chain_indexes = {'Ethereum': 1, 'Polygon': 2, 'BNB': 3}
-    all_address_index = dict(zip(labels.Contract, labels.index))
+    chain_indexes = {'ethereum': 1, 'polygon': 2, 'bsc': 3}
 
-    dataset = TransactionDataset(root=f'../GCN/{chain}', 
-                                transaction_dfs=transaction_dfs, 
-                                labels=list(labels.Category.values),
-                                contract_addresses=list(labels.Contract.values),
+    all_address_index = dict(zip(labels_select_df.Contract, labels_select_df.index))
+    
+    dataset = TransactionDataset(root=f'../data/GCN/{chain}', 
+                                transaction_dfs=transaction_dfs_select, 
+                                labels=list(labels_select_df.Category.values),
+                                contract_addresses=list(labels_select_df.Contract.values),
                                 chain=chain)
+    
+    
+

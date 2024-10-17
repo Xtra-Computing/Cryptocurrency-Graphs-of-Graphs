@@ -8,6 +8,7 @@ import pandas as pd
 from tqdm import tqdm
 import networkx as nx
 from texttable import Texttable
+
 import os
 from collections import defaultdict
 
@@ -21,14 +22,15 @@ def hierarchical_graph_reader(path):
     graph = nx.from_edgelist(edges)
     return graph
 
-def graph_level_reader(path, number_of_features=3):
+def graph_level_reader(path, feature_dim=3):
     """
     Reading a single graph from disk.
     :param path: Path to the JSON file.
     :return data: Dictionary of data.
     """
     data = json.load(open(path))
-    data['features'] = {k:v[:number_of_features] for (k,v) in data['features'].items()}
+    data['features'] = {k:v[:feature_dim] for (k,v) in data['features'].items()}
+
     return data
 
 def tab_printer(args):
@@ -69,14 +71,14 @@ class GraphDatasetGenerator(object):
             feature_lengths = [len(v) for k, v in data["features"].items()]
             features = features.union(set(feature_lengths))
         self.label_map = {v: i for i, v in enumerate(labels)}
-        self.feature_map = {v: i for i, v in enumerate(features)}
+        self.feature_map = 3 #{v: i for i, v in enumerate(features)}
         
 
     def _count_features_and_labels(self):
         """
         Counting the number of unique features and labels.
         """
-        self.number_of_features = list(self.feature_map.keys())[0]
+        self.number_of_features = 3 #len(self.feature_map)
         self.number_of_labels = len(self.label_map)
 
     def _transform_edges(self, raw_data):
@@ -105,8 +107,16 @@ class GraphDatasetGenerator(object):
         """
         number_of_nodes = len(raw_data["features"])
         feature_matrix = np.zeros((number_of_nodes, self.number_of_features))
+        
+        # index_1 = [int(n) for n, feats in raw_data["features"].items() for f in feats]
+        # index_2 = [int(self.feature_map[f]) for n, feats in raw_data["features"].items() for f in feats]
+        # feature_matrix[index_1, index_2] = 1.0
         feature_matrix = [feats for n, feats in raw_data["features"].items()]
         feature_matrix = torch.FloatTensor(feature_matrix)
+        # print(feature_matrix.shape)
+        # print(feature_matrix[0])
+        # exit()
+        
         return feature_matrix.to(self.device)
 
     def _data_transform(self, raw_data):

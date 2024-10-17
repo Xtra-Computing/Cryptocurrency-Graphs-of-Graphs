@@ -19,7 +19,10 @@ class SEALCITrainer(object):
         self.macro_graph = hierarchical_graph_reader(self.args.hierarchical_graph)
         self.dataset_generator = GraphDatasetGenerator(self.args.graphs, self.args.device)
         self._setup_macro_graph()
-        self._create_split()  
+        if self.args.split_type == 'random':
+            self._create_split()  
+        elif self.args.split_type == 'temporal':
+            self._load_split()
         self._create_masks()  
 
     def _setup_model(self):
@@ -39,6 +42,11 @@ class SEALCITrainer(object):
         else:
             raise ValueError("Unsupported model type provided.")
 
+    def read_in_file(self, path): 
+        with open(path, 'r') as file:
+            lines = file.readlines()
+        return [int(line.strip()) for line in lines]
+
 
     def _setup_macro_graph(self):
         """
@@ -48,6 +56,14 @@ class SEALCITrainer(object):
         self.macro_graph_edges = self.macro_graph_edges + [[edge[1], edge[0]] for edge in self.macro_graph.edges()]
         self.macro_graph_edges = torch.t(torch.LongTensor(self.macro_graph_edges))
         self.macro_graph_edges = self.macro_graph_edges.to(self.args.device)
+
+    def _load_split(self):
+        self.train_indices = self.read_in_file(f'../../GoG/node/{self.args.chain}_train_index_{self.args.num_classes}.txt')
+        self.test_indices = self.read_in_file(f'../../GoG/node/{self.args.chain}_test_index_{self.args.num_classes}.txt')
+
+        # Calculate and print the number of labels per class in each dataset
+        train_labels = [self.dataset_generator.target[idx].item() for idx in self.train_indices]
+        test_labels = [self.dataset_generator.target[idx].item() for idx in self.test_indices]
 
     def _create_split(self):
         """

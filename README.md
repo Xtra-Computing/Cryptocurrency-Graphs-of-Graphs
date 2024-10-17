@@ -14,7 +14,8 @@ This is the repository for "Multi-Chain Graphs of Graphs: A New Paradigm in Bloc
   - [Data Preparation](#data-prepare)
   - [Data Analysis](#data-analysis)
   - [Fraud Detection](#fraud-detection)
-  - [Multi-Class Classification](#multi-class-classification)
+  - [Multi Classification](#multi-classification)
+  - [Link Prediction](#link-prediction)
 - [License](#license)
 
 ## Repository Overview
@@ -102,7 +103,7 @@ for idx, row in df.iterrows():
 
 #### Labels
 The `labels.csv` file categorizes each contract across different chains. It includes:
-- `Chain`: Specifies the blockchain platform (e.g., Ethereum, Polygon, BSC).
+- `Chain`: Specifies the blockchain platform (e.g., ethereum, polygon, bsc).
 - `Contract`: Lists the contract address or identifier.
 - `Category`: Represents the category of the contract, indexed by the prevalence of contracts within that category (Category 0 contains the most contracts: fraud).
 
@@ -119,39 +120,45 @@ To effectively use this dataset, follow these steps:
 
 ### Data Analysis
 Scripts for analyzing both local and global graphs are located under `analysis/`. 
-- `local.py`: Script for performing detailed analysis on local graphs.
-- `global.py`: Script for analyzing global graph structures and metrics.
-- `common_node.py`: Scripts for finding common nodes in token graphs: 
+- `common_node.py`: Scripts for finding common nodes in token graphs.
 - `local_metrics/`: Contains scripts and utilities specifically for calculating various graph metrics on local graphs. 
   - nx_properties.py to measure num_nodes, num_edges, density, assortativity, reciprocity; 
   - snap_properties.py to measure  effective_diameter, clustering_coefficient.
+- `local.py`: Script for comparing and performing detailed analysis on local graphs.
+- `global.py`: Script for analyzing global graph structures and metrics.
+
 
 Run the following commands for respective analyses:
 ```bash
+python common_node.py
 python local_metrics/nx_properties.py
 python local_metrics/snap_properties.py
 python local.py
 python global.py
-python common_node.py
 ```
-
 
 ### Data Preparation
 Scripts for preparing data are under `dataset/`. 
 - `individual.py`: Script for preparing data for individual graph learning models.
-- `gog.py`: Script for preparing data for GoG-based learning models.
-- 'process_graph_metrics.py': Script for preparing graph metrics for anomaly detection models.
-- 'get_deepwalk_embedding/': Scripts for preparing deepwalk embedding for anomaly detection models.
+- `gog.py`: Script for preparing data for GoG-based learning models. 
+- `create_temporal_link.py`: Script for preparing link prediction data.
+- `process_link_gcn.py`: Script for preparing link prediction data for individual GNN models.
+- `create_temporal_node.py`: Script for preparing data for multi-class classification GoG models, with temporal splitting of train and test data.
+- `process_graph_metrics.py`: Script for preparing graph metrics for anomaly detection models.
+- `get_deepwalk_embedding/`: Scripts for preparing deepwalk embedding for anomaly detection models.
 
 ```bash
-python gog.py
 python individual.py
+python gog.py
+python create_temporal_link.py
+python process_link_gcn.py
+python create_temporal_node.py
 python process_graph_metrics.py
 
 cd get_deepwalk_embedding/
 python get_deepwalk.py
 ```
-
+In addition, when preparing the dataset, you can specify custom filters to refine the data, such as removing tokens with less than 5 transactions or focusing on transactions within a certain year or date range. These settings can be customized for both local and global graphs.
 
 ### Fraud Detection
 Navigate to `fraud_detection/` to access scripts for anomaly detection applied to individual graphs and graphs-of-graphs:
@@ -167,7 +174,7 @@ python main.py
 ```
 
 ### Multi-Class Classification
-Navigate to `multi-class_classification/` to access scripts for performing multi-class classification on both individual graphs and graphs-of-graphs:
+Navigate to `multi_classification/` to access scripts for performing multi-class classification on both individual graphs and graphs-of-graphs:
 - `graph_individual/`: This folder includes models and scripts for classifying individual graphs into multiple categories based on their structural and transactional features.
 - `graph_of_graphs/`: Contains models and scripts for classifying graphs with graphs-of-graphs model.
 
@@ -178,6 +185,21 @@ python main.py --chain polygon --model GCN
 cd graph_of_graphs/
 python main.py --chain polygon --model SEAL
 ```
+
+### Link Prediction
+Navigate to `link_prediction/` to access scripts for performing link prediction on both individual graphs and graphs-of-graphs:
+- `graph_individual/main.py`: Train individual GNN models.
+- `graph_of_graph/main.py`: Train GoG models.
+
+To run:
+```bash
+cd graph_individual/
+python main.py --chain polygon
+
+cd graph_of_graph/
+python main.py --chain polygon --model SEAL
+```
+
 
 ## License
 The dataset is released under the Creative Commons Attribution-NonCommercial-ShareAlike (CC BY-NC-SA) license. This means that anyone can use, distribute, and modify the data for non-commercial purposes as long as they give proper attribution and share the derivative works under the same license terms.

@@ -1,5 +1,4 @@
 import networkx as nx
-import community as community_louvain
 import matplotlib.pyplot as plt
 import pandas as pd
 from collections import defaultdict
@@ -8,6 +7,7 @@ import seaborn as sns
 import numpy as np
 import random
 from scipy.stats import pearsonr
+from tqdm import tqdm
 
 import warnings
 warnings.filterwarnings("ignore")
@@ -19,10 +19,7 @@ chain = 'polygon'
 chain_labels = pd.read_csv(f'../data/labels.csv').query('Chain == @chain')
 chain_class = dict(zip(chain_labels.Contract, chain_labels.Category))
 
-# read in file include the calculated common node statistics
 global_link = pd.read_csv(f'../graphs/{chain}/{chain}_common_nodes_except_null_labels.csv') 
-# read in file include the calculated metadata: number of unique address and number of transactions of each token
-chain_metadata = pd.read_csv(f'../graphs/{chain}/{chain}_metadata.csv') 
 
 global_link['Class1'] = global_link['Contract1'].map(chain_class)
 global_link['Class2'] = global_link['Contract2'].map(chain_class)
@@ -52,6 +49,18 @@ nodes = []
 for i in global_graph:
     nodes.append(i)
 node_set = set(nodes)
+
+number_of_transactions = {}
+for addr in tqdm(chain_class):
+    try:
+        tx = pd.read_csv(f'../data/transactions/{chain}/{addr}.csv')
+        tx['timestamp'] = pd.to_datetime(tx['timestamp'], unit='s')
+        end_date = pd.Timestamp('2024-03-01')
+        tx = tx[tx['timestamp'] < end_date]
+        
+        number_of_transactions[addr] = tx.shape[0]
+    except Exception as e:
+        print(f'Error for address {addr}: {e}')
 
 
 def approximate_average_shortest_path_length(G, num_landmarks=10):
@@ -125,13 +134,7 @@ top_5_weighted_degree = sorted(weighted_degree_centrality.items(), key=lambda it
 top_5_unweighted_degree_address = [i[0] for i in top_5_unweighted_degree]
 top_5_weighted_degree_address = [i[0] for i in top_5_weighted_degree]
 
-
-chain_metadata_select = chain_metadata.query('contract_address in @chain_class')
-chain_metadata_select['class'] = chain_metadata_select['contract_address'].apply(lambda x: chain_class[x] if x in chain_class else 'Others')
-
-chain_graphs_edges = dict(zip(chain_metadata_select.contract_address, chain_metadata_select.number_of_transactions))
-
-y_values = [chain_graphs_edges[node] for node in global_graph.nodes()]
+y_values = [number_of_transactions[node] for node in global_graph.nodes()]
 x_values = [unweighted_degree_centrality[node] for node in global_graph.nodes()]
 
 # Calculate Pearson correlation coefficient and p-value

@@ -22,7 +22,8 @@ def get_args():
     parser.add_argument('--model', type=str, default='GCN', choices=['GCN', 'GIN', 'GraphSAGE', 'GAT', 'ResidualGCN'], help="Type of GNN model to use.")
     parser.add_argument("--device", default="cuda:1", help='CUDA device to use (default: 1)')
     parser.add_argument('--classification_type', type=str, default='multiclass', choices=['binary', 'multiclass'], help='Type of classification task: binary or multiclass')
-    parser.add_argument('--num_classes', type=int, default=11)
+    parser.add_argument('--split_type', type=str, default='temporal', choices=['random', 'temporal'], help='Type of split: random or temporal')
+    parser.add_argument('--num_classes', type=int, default=3)
     parser.add_argument('--features', default=[0, 1, 2], nargs='+', help='List of features to include')
     return parser.parse_args()
 
@@ -38,17 +39,25 @@ def main():
         torch.manual_seed(seed)
         np.random.seed(seed)
 
-        dataset = TransactionDataset(root=f'../GCN/{args.chain}')
+        dataset = TransactionDataset(root=f'../../data/GCN/{args.chain}')
         labels = [dataset.get_label(idx) for idx in range(len(dataset))] 
         dataset = select_features_index(dataset, index=args.features)
         num_classes = len(set(labels))
-
-        train_indices, test_indices = train_test_split(
-            range(len(dataset)),
-            test_size=0.2,
-            random_state=seed,
-            stratify=labels
-        )
+        
+        if args.split_type == 'random':
+            train_indices, test_indices = train_test_split(
+                range(len(dataset)),
+                test_size=0.2,
+                random_state=seed,
+                stratify=labels
+            )
+        elif args.split_type == 'temporal':
+            train_indices_file = f"../../GoG/node/{args.chain}_train_index_{num_classes}.txt"
+            test_indices_file = f"../../GoG/node/{args.chain}_test_index_{num_classes}.txt"
+            with open(train_indices_file, 'r') as f:
+                train_indices = [int(line.strip()) for line in f]
+            with open(test_indices_file, 'r') as f:
+                test_indices = [int(line.strip()) for line in f]
 
         train_dataset = Subset(dataset, train_indices)
         test_dataset = Subset(dataset, test_indices)

@@ -50,8 +50,8 @@ def evaluate_model_with_seeds(model, best_params, x, y, seeds):
     return np.mean(auc_results), np.std(auc_results), np.mean(ap_results), np.std(ap_results)
 
 def main():
-    chain = 'bnb'
-    dataset_generator = GraphDatasetGenerator(f'../{chain}/{chain}_basic_metrics_processed.csv')
+    chain = 'polygon'
+    dataset_generator = GraphDatasetGenerator(f'../../data/features/{chain}_basic_metrics_processed.csv')
     data_list = dataset_generator.get_pyg_data_list()
     x = torch.cat([data.x for data in data_list], dim=0).numpy()
     y = torch.cat([data.y.unsqueeze(0) if data.y.dim() == 0 else data.y for data in data_list]).numpy()

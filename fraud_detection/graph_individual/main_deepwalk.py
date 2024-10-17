@@ -60,12 +60,12 @@ def load_labels(filepath, column_name='label'):
         exit()
 
 def main():
-    chain = 'bnb'
-    filepath = f'/{chain}/{chain}_basic_metrics_processed.csv'
+    chain = 'polygon'
+    filepath = f'../data/features/{chain}_basic_metrics_processed.csv'
     y = load_labels(filepath)
     
     graph_embeddings = []
-    embedding_path = f'../Deepwalk/{chain}'
+    embedding_path = f'../../data/Deepwalk/{chain}'
     
     processed_graphs = 0
     

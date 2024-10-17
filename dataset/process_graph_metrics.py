@@ -3,7 +3,8 @@ import numpy as np
 from sklearn.preprocessing import StandardScaler
 
 def main():
-    chain = 'BNB'
+
+    chain = 'polygon'
     graphs1 = pd.read_csv(f'../result/{chain}_basic_metrics.csv')
     graphs2 = pd.read_csv(f'../result/{chain}_advanced_metrics_labels.csv')
     
@@ -22,7 +23,7 @@ def main():
                'Effective_Diameter', 'Clustering_Coefficient']
     features[columns] = scaler.fit_transform(features[columns])
     
-    features.to_csv(f'../{chain}_basic_metrics_processed.csv', index=False)
+    features.to_csv(f'../data/features/{chain}_basic_metrics_processed.csv', index=False)
 
 if __name__ == "__main__":
     main()

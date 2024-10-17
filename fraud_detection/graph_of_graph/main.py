@@ -1,7 +1,7 @@
 import torch
 import numpy as np
 import random
-from pygod.detector import DOMINANT, DONE, GAE, AnomalyDAE, DMGD, GUIDE, OCGNN, CoLA, CONAD, GADNR
+from pygod.detector import DOMINANT, DONE, GAE, AnomalyDAE, CoLA
 from pygod.metric import eval_roc_auc
 from torch_geometric.data import Data
 from sklearn.metrics import roc_auc_score, average_precision_score
@@ -58,11 +58,11 @@ def run_model(detector, data, seeds):
 def main():
     args = Args()
     chain = 'bnb'
-    dataset_generator = GraphDatasetGenerator(f'/{chain}/{chain}_basic_metrics_processed.csv')
+    dataset_generator = GraphDatasetGenerator(f'../data/features/{chain}_basic_metrics_processed.csv')
     data_list = dataset_generator.get_pyg_data_list()
 
     x = torch.cat([data.x for data in data_list], dim=0)
-    hierarchical_graph = hierarchical_graph_reader(f'../GoG/{chain}/edges/global_edges.csv')
+    hierarchical_graph = hierarchical_graph_reader(f'../../GoG/{chain}/edges/global_edges.csv')
     edge_index = torch.LongTensor(list(hierarchical_graph.edges)).t().contiguous()
     global_data = Data(x=x, edge_index=edge_index, y=dataset_generator.target)
     
