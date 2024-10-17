@@ -28,7 +28,7 @@ This repository contains both the datasets used in our research and the code for
 ## Dataset Schema
 Below are key statistics for each blockchain included in our dataset:
 
-| Chain     | # Tokens | Start Months | End Months | # Transactions | # Addresses | # Categories |
+| Chain     | # Tokens | Start Month | End Month | # Transactions | # Addresses | # Categories |
 |-----------|----------|--------------|------------|----------------|-------------|--------------|
 | Ethereum  | 14,464   | 2016-02      | 2024-02    | 81,788,211     | 10,247,767  | 290          |
 | Polygon   | 2,353    | 2020-08      | 2024-02    | 64,882,233     | 1,801,976   | 112          |
