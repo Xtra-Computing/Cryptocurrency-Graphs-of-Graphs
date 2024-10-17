@@ -22,7 +22,7 @@ This is the repository for "Multi-Chain Graphs of Graphs: A New Paradigm in Bloc
 This repository contains both the datasets used in our research and the code for analysis and model training. Here you can find everything needed to replicate our studies or use our data and models for your own research.
 
 <p align='center'>
-  <img width='100%' src='gog-overview.png' />
+  <img width='90%' src='gog-overview.png' />
 </p>
 
 ## Dataset Schema
