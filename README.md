@@ -137,8 +137,7 @@ Run the following commands for respective analyses:
 python common_node.py
 python local_metrics/nx_properties.py
 python local_metrics/snap_properties.py
-python local.py
-python global.py
+python local.py && python global.py
 ```
 
 ### Data Preparation
@@ -153,13 +152,9 @@ Scripts for preparing data are under `dataset/`.
 - `get_deepwalk_embedding/`: Scripts for preparing deepwalk embedding for anomaly detection models.
 
 ```bash
-python data_collection_script.py
-python individual.py
-python gog.py
-python create_temporal_link.py
-python process_link_gcn.py
-python create_temporal_node.py
-python process_graph_metrics.py
+python data_collection_script.py 
+
+python individual.py && python gog.py && python create_temporal_link.py && python process_link_gcn.py && python create_temporal_node.py && python process_graph_metrics.py
 
 cd get_deepwalk_embedding/
 python get_deepwalk.py
