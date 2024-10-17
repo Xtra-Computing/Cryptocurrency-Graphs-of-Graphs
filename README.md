@@ -22,7 +22,7 @@ This is the repository for "Multi-Chain Graphs of Graphs: A New Paradigm in Bloc
 This repository contains both the datasets used in our research and the code for analysis and model training. Here you can find everything needed to replicate our studies or use our data and models for your own research.
 
 <p align='center'>
-  <img width='100%' src='gog_overview.pdf' />
+  <img width='100%' src='gog-overview.png' />
 </p>
 
 ## Dataset Schema
@@ -167,33 +167,33 @@ In addition, when preparing the dataset, you can specify custom filters to refin
 ### Fraud Detection
 Navigate to `fraud_detection/` to access scripts for anomaly detection applied to individual graphs and graphs-of-graphs:
 - `graph_individual/`: Includes code for detecting anomalies in individual graph structures using graph metrics and deepwalk.
-- `graph_of_graph/`: Includes code for anomaly detection employing techniques that consider graphs-of-graphs model using graph metrics and deepwalk.
+- `graph_of_graph/`: Includes code for anomaly detection employing techniques that consider graph models using graph metrics and deepwalk.
 
 ```bash
 cd graph_individual/
 python main.py
 
-cd graph_of_graphs/
+cd graph_of_graph/
 python main.py
 ```
 
 ### Multi-Class Classification
 Navigate to `multi_classification/` to access scripts for performing multi-class classification on both individual graphs and graphs-of-graphs:
-- `graph_individual/`: This folder includes models and scripts for classifying individual graphs into multiple categories based on their structural and transactional features.
-- `graph_of_graphs/`: Contains models and scripts for classifying graphs with graphs-of-graphs model.
+- `graph_individual/`: Includes code for classifying individual graphs into multiple categories based on their structural and transactional features.
+- `graph_of_graph/`: Includes code for classifying graphs with graphs-of-graphs model.
 
 ```bash
 cd graph_individual/
 python main.py --chain polygon --model GCN
 
-cd graph_of_graphs/
+cd graph_of_graph/
 python main.py --chain polygon --model SEAL
 ```
 
 ### Link Prediction
 Navigate to `link_prediction/` to access scripts for performing link prediction on both individual graphs and graphs-of-graphs:
-- `graph_individual/main.py`: Train individual GNN models.
-- `graph_of_graph/main.py`: Train GoG models.
+- `graph_individual/`: Includes code for predicting links on global graph using individual GNN models.
+- `graph_of_graph/`: Includes code for predicting links on GoG frameworks using graphs-of-graphs models.
 
 ```bash
 cd graph_individual/
