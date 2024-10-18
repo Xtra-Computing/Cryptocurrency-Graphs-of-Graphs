@@ -203,3 +203,6 @@ python main.py --chain polygon --model SEAL
 
 ## License
 The dataset is released under the Creative Commons Attribution-NonCommercial-ShareAlike (CC BY-NC-SA) license. This means that anyone can use, distribute, and modify the data for non-commercial purposes as long as they give proper attribution and share the derivative works under the same license terms.
+
+## Citation
+If you find this repository useful, please cite our paper.
