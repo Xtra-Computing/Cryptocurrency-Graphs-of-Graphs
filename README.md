@@ -1,6 +1,6 @@
 # Multi-Chain Graphs of Graphs Dataset
 
-This is the repository for "Multi-Chain Graphs of Graphs: A New Paradigm in Blockchain Dataset". This comprehensive study introduces a pioneering, large-scale, cross-chain dataset using a graphs-of-graphs approach to analyze complex blockchain networks. 
+This is the repository for "Multi-Chain Graphs of Graphs: A New Approach to Analyzing Blockchain Datasets". This comprehensive study introduces a pioneering, large-scale, cross-chain dataset using a graphs-of-graphs approach to analyze complex blockchain networks. 
 
 ## Table of Contents
 - [Repository Overview](#repository-overview)
